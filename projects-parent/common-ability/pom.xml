@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>org.reimuwang</groupId>
-	<artifactId>file-management</artifactId>
+	<artifactId>common-ability</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>file-management</name>
-	<description>管理拥有的文件(主要位于移动硬盘中)</description>
+	<name>common-ability</name>
+	<description>可复用的，通用的能力</description>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -43,12 +43,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.reimuwang</groupId>
-			<artifactId>common-ability</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -56,6 +50,9 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<classifier>exec</classifier>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
