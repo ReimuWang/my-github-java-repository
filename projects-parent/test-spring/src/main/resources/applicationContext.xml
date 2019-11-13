@@ -7,7 +7,4 @@
     <context:annotation-config />
     <context:component-scan base-package="org.reimuwang.testspring" />
 
-    <bean id="test" class="org.reimuwang.testspring.Test">
-        <property name="p" value="23"/>
-    </bean>
 </beans>

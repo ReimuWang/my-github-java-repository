@@ -1,4 +1,4 @@
-package org.reimuwang.filemanagement.test;
+package org.reimuwang.testspringboot.test;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +11,6 @@ public class TestController {
     @RequestMapping("/test")
     public String testWeb() {
         log.info("请求了一次testWeb接口");
-        return "a";
+        return "hello world";
     }
 }
