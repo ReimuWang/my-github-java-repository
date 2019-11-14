@@ -43,6 +43,7 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.reimuwang</groupId>
 			<artifactId>common-ability</artifactId>
