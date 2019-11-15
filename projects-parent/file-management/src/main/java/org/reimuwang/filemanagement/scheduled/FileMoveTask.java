@@ -1,8 +1,8 @@
 package org.reimuwang.filemanagement.scheduled;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.reimuwang.commonability.file.FileMove;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * sourceDir：源文件夹
@@ -39,7 +38,7 @@ public class FileMoveTask {
     @Value("${reimuwang.fileMove.markPrefix}")
     private String markPrefix;
 
-    private static final String SEPARATOR = "\\.";
+    private static final String SEPARATOR = "";
 
     /**
      * 文件发生移动：打印日志
@@ -72,7 +71,7 @@ public class FileMoveTask {
         }
         // 待移动文件的新名字和排序
         String oldName = fileToMove.getName();
-        String[] oldNameSplit = oldName.split(FileMoveTask.SEPARATOR, 3);
+        String[] oldNameSplit = oldName.split("\\.", 3);
         String errLogForMoveName = "待移动文件名称非法,name=" + fileToMove.getName();
         if (oldNameSplit.length != 3 || StringUtils.isBlank(oldNameSplit[1]) || !StringUtils.isNumeric(oldNameSplit[1])) {
             this.printErrorLog(errLogForMoveName);
@@ -84,38 +83,8 @@ public class FileMoveTask {
             return;
         }
         // 移动
-        String mvNewName = this.moveFile(fileToMove, newIndex, oldNameSplit[2], targetDirFile);
+        String mvNewName = FileMove.moveFile(fileToMove, newIndex, oldNameSplit[2], targetDirFile);
         log.info("文件移动成功,dir:[" + this.sourceDir + "]->[" + this.targetDir + "].name:[" + oldName + "]->[" + mvNewName + "]");
-    }
-
-    private String moveFile(File fileToMove, Integer mvNewIndex, String mvOldName, File targetDirFile) {
-        List<FileForSort> fileList = Arrays.asList(targetDirFile.listFiles())
-                                     .stream()
-                                     .filter(file -> file.isFile())
-                                     .map(file -> {
-                                         String[] oldNameSplit = file.getName().split(FileMoveTask.SEPARATOR, 2);
-                                         Integer index = null;
-                                         if (oldNameSplit.length == 2
-                                                 && StringUtils.isNotBlank(oldNameSplit[0])
-                                                 && StringUtils.isNumeric(oldNameSplit[0])) {
-                                             index = Integer.parseInt(oldNameSplit[0]);
-                                         }
-                                         return new FileForSort(file, index, oldNameSplit[1]);
-                                     })
-                                     .filter(fileForSort -> null != fileForSort.getIndex()
-                                                            && fileForSort.getIndex() >= 0
-                                                            && StringUtils.isNotBlank(fileForSort.getName()))
-                                     .sorted()
-                                     .collect(Collectors.toList());
-        List<FileForSort> fileToMoveList = fileList.stream()
-                                                   .filter(fileForSort -> fileForSort.getIndex() >= mvNewIndex)
-                                                   .collect(Collectors.toList());
-        Integer finalIndex = fileToMoveList.isEmpty() ? fileList.size() : mvNewIndex.intValue();
-        fileToMoveList.forEach(fileForSort ->
-                               fileForSort.getFile().renameTo(new File(targetDirFile, (fileForSort.getIndex() + 1) + "." + fileForSort.getName())));
-        String result = finalIndex + "." + mvOldName;
-        fileToMove.renameTo(new File(targetDirFile, result));
-        return result;
     }
 
     private File getFileToMove(File sourceDirFile) {
@@ -153,31 +122,5 @@ public class FileMoveTask {
 
     private boolean checkDir(File dir) {
         return dir.exists() && dir.isDirectory();
-    }
-}
-
-@Data
-class FileForSort implements Comparable<FileForSort> {
-
-    private File file;
-
-    private Integer index;
-
-    private String name;
-
-    public FileForSort(File file, Integer index, String name) {
-        this.file = file;
-        this.index = index;
-        this.name = name;
-    }
-
-    /**
-     * 倒序
-     * @param o
-     * @return
-     */
-    @Override
-    public int compareTo(FileForSort o) {
-        return o.index.compareTo(this.index);
     }
 }
