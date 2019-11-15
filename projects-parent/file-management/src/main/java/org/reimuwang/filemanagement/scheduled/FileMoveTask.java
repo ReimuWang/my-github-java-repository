@@ -10,19 +10,25 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @Slf4j
 public class FileMoveTask {
 
-    @Value("${reimuwang.fileMove.sourceDir}")
-    private String sourceDir;
+    @Value("${reimuwang.fileMove.sourceDirs}")
+    private String sourceDirs;
 
-    @Value("${reimuwang.fileMove.targetDir}")
-    private String targetDir;
+    @Value("${reimuwang.fileMove.targetDirs}")
+    private String targetDirs;
 
     @Value("${reimuwang.fileMove.prefix}")
     private String prefix;
+
+    private String[] sourceDirArray;
+
+    private String[] targetDirArray;
 
     /**
      * 文件发生移动：打印日志
@@ -34,26 +40,36 @@ public class FileMoveTask {
 
     private long lastPringLogTime = System.currentTimeMillis();
 
-    private FileMoveUtils fileMoveUtils;
+    private List<FileMoveUtils> fileMoveUtilsList = new ArrayList<>();
 
     @PostConstruct
     public void init() {
-        this.fileMoveUtils = FileMoveUtils.init(this.sourceDir, this.targetDir, this.prefix).build();
+        String separator = ";";
+        this.sourceDirArray = this.sourceDirs.split(separator);
+        this.targetDirArray = this.targetDirs.split(separator);
+        if (this.sourceDirArray.length != this.targetDirArray.length) {
+            throw new IllegalArgumentException(this.sourceDirs + "与" + this.targetDirs + "按" + separator + "切分出的个数不一致");
+        }
+        for (int i = 0; i < this.sourceDirArray.length; i++) {
+            this.fileMoveUtilsList.add(FileMoveUtils.init(this.sourceDirArray[i], this.targetDirArray[i], this.prefix).build());
+        }
     }
 
     @Scheduled(fixedDelay=500)
     public void moveFile() {
-        String[] result = null;
-        try {
-            result = this.fileMoveUtils.moveFile();
-        } catch (FileNotFoundException e) {
-            this.printErrorLog(e);
-        } catch (FileMatchMultipleException e1) {
-            this.printErrorLog(e1);
-        } catch (IllegalFileNameException e2) {
-            this.printErrorLog(e2);
+        for (int i = 0; i < this.fileMoveUtilsList.size(); i++) {
+            String[] result = null;
+            try {
+                result = this.fileMoveUtilsList.get(i).moveFile();
+            } catch (FileNotFoundException e) {
+                this.printErrorLog(e);
+            } catch (FileMatchMultipleException e1) {
+                this.printErrorLog(e1);
+            } catch (IllegalFileNameException e2) {
+                this.printErrorLog(e2);
+            }
+            log.info("文件移动成功,dir:[" + this.sourceDirArray[i] + "]->[" + this.targetDirArray[i] + "].name:[" + result[0] + "]->[" + result[1] + "]");
         }
-        log.info("文件移动成功,dir:[" + this.sourceDir + "]->[" + this.targetDir + "].name:[" + result[0] + "]->[" + result[1] + "]");
     }
 
     private void printErrorLog(Exception e) {

@@ -5,7 +5,7 @@ logconfig:
 reimuwang:
   rootDirs: /Users/reimuwang/Downloads/test1;/Users/reimuwang/Downloads/test2
   fileMove:
-    sourceDir: /Users/reimuwang/Downloads/test1
-    targetDir: /Users/reimuwang/Downloads/test2
+    sourceDirs: /Users/reimuwang/Downloads/test1;/Users/reimuwang/Downloads/test3
+    targetDirs: /Users/reimuwang/Downloads/test2;/Users/reimuwang/Downloads/test4
     prefix: mm
     errorLogIntervalSecond: 5
