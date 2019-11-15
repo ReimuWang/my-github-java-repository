@@ -8,3 +8,4 @@ reimuwang:
     sourceDir: /Users/reimuwang/Downloads/test1
     targetDir: /Users/reimuwang/Downloads/test2
     markPrefix: tempMove
+    errorLogIntervalSecond: 5
