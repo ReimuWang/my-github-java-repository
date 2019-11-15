@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -50,7 +51,7 @@ public class FileMoveTask {
 
     private long lastPringLogTime = System.currentTimeMillis();
 
-    @Scheduled(fixedDelay=100000000)
+    @Scheduled(fixedDelay=500)
     public void moveFile() {
         // 源文件夹
         File sourceDirFile = new File(this.sourceDir);
@@ -70,7 +71,8 @@ public class FileMoveTask {
             return;
         }
         // 待移动文件的新名字和排序
-        String[] oldNameSplit = fileToMove.getName().split(FileMoveTask.SEPARATOR, 3);
+        String oldName = fileToMove.getName();
+        String[] oldNameSplit = oldName.split(FileMoveTask.SEPARATOR, 3);
         String errLogForMoveName = "待移动文件名称非法,name=" + fileToMove.getName();
         if (oldNameSplit.length != 3 || StringUtils.isBlank(oldNameSplit[1]) || !StringUtils.isNumeric(oldNameSplit[1])) {
             this.printErrorLog(errLogForMoveName);
@@ -82,27 +84,54 @@ public class FileMoveTask {
             return;
         }
         // 移动
-        this.moveFile(new FileForSort(fileToMove, newIndex, oldNameSplit[2]), targetDirFile);
+        String mvNewName = this.moveFile(fileToMove, newIndex, oldNameSplit[2], targetDirFile);
+        log.info("文件移动成功,dir:[" + this.sourceDir + "]->[" + this.targetDir + "].name:[" + oldName + "]->[" + mvNewName + "]");
     }
 
-    private void moveFile(FileForSort fileToMove, File targetDirFile) {
-//        Arrays.asList(targetDirFile.listFiles()).stream()
-//                .filter(file -> file.isFile())
+    private String moveFile(File fileToMove, Integer mvNewIndex, String mvOldName, File targetDirFile) {
+        List<FileForSort> fileList = Arrays.asList(targetDirFile.listFiles())
+                                     .stream()
+                                     .filter(file -> file.isFile())
+                                     .map(file -> {
+                                         String[] oldNameSplit = file.getName().split(FileMoveTask.SEPARATOR, 2);
+                                         Integer index = null;
+                                         if (oldNameSplit.length == 2
+                                                 && StringUtils.isNotBlank(oldNameSplit[0])
+                                                 && StringUtils.isNumeric(oldNameSplit[0])) {
+                                             index = Integer.parseInt(oldNameSplit[0]);
+                                         }
+                                         return new FileForSort(file, index, oldNameSplit[1]);
+                                     })
+                                     .filter(fileForSort -> null != fileForSort.getIndex()
+                                                            && fileForSort.getIndex() >= 0
+                                                            && StringUtils.isNotBlank(fileForSort.getName()))
+                                     .sorted()
+                                     .collect(Collectors.toList());
+        List<FileForSort> fileToMoveList = fileList.stream()
+                                                   .filter(fileForSort -> fileForSort.getIndex() >= mvNewIndex)
+                                                   .collect(Collectors.toList());
+        Integer finalIndex = fileToMoveList.isEmpty() ? fileList.size() : mvNewIndex.intValue();
+        fileToMoveList.forEach(fileForSort ->
+                               fileForSort.getFile().renameTo(new File(targetDirFile, (fileForSort.getIndex() + 1) + "." + fileForSort.getName())));
+        String result = finalIndex + "." + mvOldName;
+        fileToMove.renameTo(new File(targetDirFile, result));
+        return result;
     }
 
     private File getFileToMove(File sourceDirFile) {
-        Stream<File> fileToMoveStream = Arrays.asList(sourceDirFile.listFiles())
-                                        .stream()
-                                        .filter(file -> file.isFile() && file.getName().startsWith(this.markPrefix));
-        if (fileToMoveStream.count() == 0) {
+        List<File> fileToMoveList = Arrays.asList(sourceDirFile.listFiles())
+                                          .stream()
+                                          .filter(file -> file.isFile() && file.getName().startsWith(this.markPrefix))
+                                          .collect(Collectors.toList());
+        if (fileToMoveList.isEmpty()) {
             return null;
         }
-        if (fileToMoveStream.count() > 1) {
-            String fileToMoveListStr = fileToMoveStream.map(File::getName).collect(Collectors.joining(","));
+        if (fileToMoveList.size() > 1) {
+            String fileToMoveListStr = fileToMoveList.stream().map(File::getName).collect(Collectors.joining(","));
             this.printErrorLog("匹配到可移动前缀的文件有多个,markPrefix=" + this.markPrefix + ",fileToMoveListStr=" + fileToMoveListStr);
             return null;
         }
-        return fileToMoveStream.collect(Collectors.toList()).get(0);
+        return fileToMoveList.get(0);
     }
 
     private void printErrorLog(String msg) {
@@ -134,12 +163,12 @@ class FileForSort implements Comparable<FileForSort> {
 
     private Integer index;
 
-    private String newName;
+    private String name;
 
-    public FileForSort(File file, Integer index, String newName) {
+    public FileForSort(File file, Integer index, String name) {
         this.file = file;
         this.index = index;
-        this.newName = newName;
+        this.name = name;
     }
 
     /**

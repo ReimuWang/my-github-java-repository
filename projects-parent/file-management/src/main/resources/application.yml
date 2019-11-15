@@ -7,5 +7,5 @@ reimuwang:
   fileMove:
     sourceDir: /Users/reimuwang/Downloads/test1
     targetDir: /Users/reimuwang/Downloads/test2
-    markPrefix: tempMove
+    markPrefix: m
     errorLogIntervalSecond: 5
