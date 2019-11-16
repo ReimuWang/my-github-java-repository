@@ -68,6 +68,9 @@ public class FileMoveTask {
             } catch (IllegalFileNameException e2) {
                 this.printErrorLog(e2);
             }
+            if (null == result) {
+                return;
+            }
             log.info("文件移动成功,dir:[" + this.sourceDirArray[i] + "]->[" + this.targetDirArray[i] + "].name:[" + result[0] + "]->[" + result[1] + "]");
         }
     }
