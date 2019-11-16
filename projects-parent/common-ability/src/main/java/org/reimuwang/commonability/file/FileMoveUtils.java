@@ -199,6 +199,9 @@ public class FileMoveUtils {
             numMergeList.add(current);
             current = new NumMerge(fileForSort);
         }
+        if (null != current) {
+            numMergeList.add(current);
+        }
         for (int i = 0; i < numMergeList.size(); i++) {
             List<FileForSort> currentValueList = numMergeList.get(i).getFileForSortList();
             for (FileForSort fileForSort : currentValueList) {

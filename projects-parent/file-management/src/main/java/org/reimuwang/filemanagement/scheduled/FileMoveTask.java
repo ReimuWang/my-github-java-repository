@@ -1,15 +1,12 @@
 package org.reimuwang.filemanagement.scheduled;
 
 import lombok.extern.slf4j.Slf4j;
-import org.reimuwang.commonability.file.FileMatchMultipleException;
 import org.reimuwang.commonability.file.FileMoveUtils;
-import org.reimuwang.commonability.file.IllegalFileNameException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,15 +58,11 @@ public class FileMoveTask {
             String[] result = null;
             try {
                 result = this.fileMoveUtilsList.get(i).moveFile();
-            } catch (FileNotFoundException e) {
+            } catch (Exception e) {
                 this.printErrorLog(e);
-            } catch (FileMatchMultipleException e1) {
-                this.printErrorLog(e1);
-            } catch (IllegalFileNameException e2) {
-                this.printErrorLog(e2);
             }
             if (null == result) {
-                return;
+                continue;
             }
             log.info("文件移动成功,dir:[" + this.sourceDirArray[i] + "]->[" + this.targetDirArray[i] + "].name:[" + result[0] + "]->[" + result[1] + "]");
         }
