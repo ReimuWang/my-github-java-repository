@@ -14,6 +14,9 @@ import java.util.List;
 @Slf4j
 public class FileMoveTask {
 
+    @Value("${reimuwang.fileMove.start}")
+    private Boolean start = false;
+
     @Value("${reimuwang.fileMove.sourceDirs}")
     private String sourceDirs;
 
@@ -41,6 +44,9 @@ public class FileMoveTask {
 
     @PostConstruct
     public void init() {
+        if (!this.start) {
+            return;
+        }
         String separator = ";";
         this.sourceDirArray = this.sourceDirs.split(separator);
         this.targetDirArray = this.targetDirs.split(separator);
@@ -54,6 +60,9 @@ public class FileMoveTask {
 
     @Scheduled(fixedDelay=500)
     public void moveFile() {
+        if (!this.start) {
+            return;
+        }
         for (int i = 0; i < this.fileMoveUtilsList.size(); i++) {
             String[] result = null;
             try {
