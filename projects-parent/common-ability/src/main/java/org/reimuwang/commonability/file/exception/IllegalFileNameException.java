@@ -1,4 +1,4 @@
-package org.reimuwang.commonability.file;
+package org.reimuwang.commonability.file.exception;
 
 /**
  * 文件名非法时抛出本异常
