@@ -77,6 +77,10 @@ public class AlbumManageServiceImpl implements AlbumManageService {
             localMinPhotoDir.mkdir();
         }
         for(File sourceFile : sourceDir.listFiles()) {
+            if (!ImageUtils.checkIfUnhideImageFile(sourceFile)) {
+                log.warn("相册图片复制时，" + sourceFile.getName() + "被过滤掉");
+                continue;
+            }
             BufferedImage squareImg = ImageUtils.toSquare(ImageIO.read(sourceFile));
             int rotate = 0;
             // photo
@@ -102,6 +106,10 @@ public class AlbumManageServiceImpl implements AlbumManageService {
     private void upload(String localDirPath, String ossDirPath) {
         File localDir = new File(localDirPath);
         for(File img : localDir.listFiles()) {
+            if (!ImageUtils.checkIfUnhideImageFile(img)) {
+                log.warn("相册图片上传时，" + img.getName() + "被过滤掉");
+                continue;
+            }
             alibabaOssHandler.putObject(img.getAbsolutePath(), ossDirPath + img.getName());
             log.info("图片" + img.getAbsolutePath() + "上传完成，" + localDirPath + "->" + ossDirPath);
         }
