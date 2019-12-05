@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     @RequestMapping("/test")
-    public String testWeb() {
-        log.info("请求了一次testWeb接口");
+    public String testWeb(TestEntity testEntity) {
+        log.info("请求了一次testWeb接口=" + testEntity);
         return "hello world";
     }
 }
