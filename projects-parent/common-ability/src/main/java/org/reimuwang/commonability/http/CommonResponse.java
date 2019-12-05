@@ -26,6 +26,16 @@ public class CommonResponse {
         response.setStatus(ResponseStatus.SUCCESS.getDesc());
         return response;
     }
+
+    public static CommonResponse error(Object msg) {
+        return CommonResponse.error(null, msg);
+    }
+
+    public static CommonResponse error(Object data, Object msg) {
+        CommonResponse response = new CommonResponse(data, msg);
+        response.setStatus(ResponseStatus.ERROR.getDesc());
+        return response;
+    }
 }
 
 enum ResponseStatus {
