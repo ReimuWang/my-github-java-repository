@@ -2,14 +2,15 @@ package org.reimuwang.blogmanagement.utils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.reimuwang.commonability.file.FileWriteUtils;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
+@Slf4j
 public class AlbumJsonDataHandler {
 
     private Map<String, JSONObject> map;
@@ -19,32 +20,37 @@ public class AlbumJsonDataHandler {
     }
 
     public void add(String name) {
-        // 解析原始名称
-        String[] array1 = name.split("\\.");
-        String[] array2 = array1[0].split("_");
-        String dateStr = array2[0];
-        String hmsStr = array2[1];
-        String subjectStr = array2[2];
-        String descStr = array2[3];
-        // 获得本图片所属天的结构体(若没有则创建)
-        if (!this.map.containsKey(dateStr)) {
-            JSONObject arrValue = new JSONObject();
-            arrValue.put("text", new JSONArray());
-            arrValue.put("type", new JSONArray());
-            arrValue.put("link", new JSONArray());
-            arrValue.put("year", Integer.parseInt(dateStr.substring(0, 4)));
-            arrValue.put("month", Integer.parseInt(dateStr.substring(4, 6)));
-            arrValue.put("day", Integer.parseInt(dateStr.substring(6, 8)));
-            JSONObject arr = new JSONObject();
-            arr.put("arr", arrValue);
-            this.map.put(dateStr, arr);
+        try {
+            // 解析原始名称
+            String[] array1 = name.split("\\.");
+            String[] array2 = array1[0].split("_");
+            String dateStr = array2[0];
+            String hmsStr = array2[1];
+            String subjectStr = array2[2];
+            String descStr = array2[3];
+            // 获得本图片所属天的结构体(若没有则创建)
+            if (!this.map.containsKey(dateStr)) {
+                JSONObject arrValue = new JSONObject();
+                arrValue.put("text", new JSONArray());
+                arrValue.put("type", new JSONArray());
+                arrValue.put("link", new JSONArray());
+                arrValue.put("year", Integer.parseInt(dateStr.substring(0, 4)));
+                arrValue.put("month", Integer.parseInt(dateStr.substring(4, 6)));
+                arrValue.put("day", Integer.parseInt(dateStr.substring(6, 8)));
+                JSONObject arr = new JSONObject();
+                arr.put("arr", arrValue);
+                this.map.put(dateStr, arr);
+            }
+            JSONObject day = this.map.get(dateStr);
+            day.getJSONObject("arr").getJSONArray("text").add(this.getHMS(hmsStr) +
+                    ("0".equals(subjectStr) ? "" : "[" + subjectStr + "]") +
+                    ("0".equals(descStr) ? "" : descStr));
+            day.getJSONObject("arr").getJSONArray("type").add("image");
+            day.getJSONObject("arr").getJSONArray("link").add(name);
+        } catch (Exception e) {
+            log.error("AlbumJsonDataHandler添加名称出错,name=" + name, e);
+            throw e;
         }
-        JSONObject day = this.map.get(dateStr);
-        day.getJSONObject("arr").getJSONArray("text").add(this.getHMS(hmsStr) +
-                                 ("0".equals(subjectStr) ? "" : "[" + subjectStr + "]") +
-                                 ("0".equals(descStr) ? "" : descStr));
-        day.getJSONObject("arr").getJSONArray("type").add("image");
-        day.getJSONObject("arr").getJSONArray("link").add(name);
     }
 
     private String getHMS(String hmsStr) {
