@@ -17,6 +17,10 @@ public class CommonResponse {
         this.msg = null == msg ? "" : msg;
     }
 
+    public static CommonResponse success() {
+        return CommonResponse.success(null, null);
+    }
+
     public static CommonResponse success(Object msg) {
         return CommonResponse.success(null, msg);
     }
@@ -25,6 +29,10 @@ public class CommonResponse {
         CommonResponse response = new CommonResponse(data, msg);
         response.setStatus(ResponseStatus.SUCCESS.getDesc());
         return response;
+    }
+
+    public static CommonResponse error() {
+        return CommonResponse.error(null, null);
     }
 
     public static CommonResponse error(Object msg) {

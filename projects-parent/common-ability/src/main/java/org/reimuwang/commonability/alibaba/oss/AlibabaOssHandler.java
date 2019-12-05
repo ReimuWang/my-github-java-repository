@@ -1,11 +1,14 @@
 package org.reimuwang.commonability.alibaba.oss;
 
+import ch.qos.logback.classic.gaffer.PropertyUtil;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.ListObjectsRequest;
 import com.aliyun.oss.model.ObjectListing;
+import com.aliyun.oss.model.PutObjectResult;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -83,6 +86,23 @@ public class AlibabaOssHandler {
     private void closeClient(OSSClient ossClient) {
         if (null != ossClient) {
             ossClient.shutdown();
+        }
+    }
+
+    /**
+     * @param sourceName 源文件，形如 D:\\1.txt
+     * @param objectName 上传到阿里云后的文件名 形如 dir1/dir2/test.txt
+     */
+    public PutObjectResult putObject(String sourceName, String objectName) {
+        if (StringUtils.isBlank(sourceName) || StringUtils.isBlank(objectName)) {
+            throw new NullPointerException("sourceName 或 objectName为空");
+        }
+        OSSClient ossClient = null;
+        try {
+            ossClient = getClient();
+            return ossClient.putObject(bucketName, objectName, new File(sourceName));
+        } finally {
+            closeClient(ossClient);
         }
     }
 }
