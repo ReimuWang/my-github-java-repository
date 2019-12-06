@@ -1,14 +1,17 @@
 package org.reimuwang.blogmanagement.entity.article;
 
-public enum CheckResultStatus {
+/**
+ * 文章引用类型
+ */
+public enum ArticleAdduceType {
 
-    SUCCESS("正常")
-    , WARN("轻微问题-可接受")
-    , ERROR("严重问题-需解决");
+    ARTICLE("文章")
+    , IMAGE("图片")
+    , UNKNOWN("未知");
 
     private String desc;
 
-    private CheckResultStatus(String desc) {
+    private ArticleAdduceType(String desc) {
         this.desc = desc;
     }
 

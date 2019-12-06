@@ -4,10 +4,13 @@ import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.reimuwang.blogmanagement.utils.ArticleParseHandler;
+import org.reimuwang.commonability.file.FileIOUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,9 +49,9 @@ public class ArticleEntity {
     private String title = "";
 
     /**
-     * 文章发布日期，即为文章内容头部区域的date字段值的时间戳
+     * 文章发布日期，即为文章内容头部区域的date字段值对应的时间
      */
-    private Long date = -1L;
+    private Date createTime;
 
     /**
      * tag列表，即为文章内容头部区域的tags字段值转换成的列表
@@ -60,6 +63,9 @@ public class ArticleEntity {
      */
     private String category = "";
 
+    /**
+     * 文章引用列表，默认排序为文章中的出现顺序
+     */
     private List<ArticleAdduceEntity> articleAdduceEntityList = new ArrayList<>();
 
     private CheckResult checkResult = CheckResult.success();
@@ -68,20 +74,15 @@ public class ArticleEntity {
      * 构建失败则返回null
      * @return
      */
-    public static ArticleEntity build(File article) throws FileNotFoundException {
-        if (null == article) {
-            throw new NullPointerException("传入article实例为null");
-        }
-        if (!article.exists()) {
-            throw new FileNotFoundException("文件不存在,path=" + article.getPath());
-        }
+    public static ArticleEntity build(File article) throws Exception {
         if (!checkInitFile(article)) {
-            log.warn("构建文章时发现传入文件非法,path=" + article.getPath());
+            log.warn("构建文章时发现传入文件非法,name=" + article.getName());
             return null;
         }
         ArticleEntity result = new ArticleEntity();
         result.article = article;
         result.fileName = result.article.getName();
+        ArticleParseHandler.init(FileIOUtils.readByLine(result.article.getPath()), result).parse();
         return result;
     }
 
@@ -94,5 +95,13 @@ public class ArticleEntity {
             return false;
         }
         return true;
+    }
+
+    public void setTagArray(String[] tags) {
+        this.tagList = new ArrayList<>(Arrays.asList(tags));
+    }
+
+    public void addArticleAdduceEntity(String showName, String path, ArticleAdduceType type) {
+        this.articleAdduceEntityList.add(new ArticleAdduceEntity(showName, path, type));
     }
 }

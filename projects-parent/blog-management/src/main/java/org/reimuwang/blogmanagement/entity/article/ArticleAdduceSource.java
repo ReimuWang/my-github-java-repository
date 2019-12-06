@@ -18,4 +18,9 @@ public enum ArticleAdduceSource {
     public String getDesc() {
         return desc;
     }
+
+    @Override
+    public String toString() {
+        return this.desc;
+    }
 }

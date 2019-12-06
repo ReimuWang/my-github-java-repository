@@ -1,5 +1,7 @@
 package org.reimuwang.blogmanagement.entity.article;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -11,6 +13,7 @@ import java.util.List;
 @Data
 public class CheckResult {
 
+    @JSONField(serialzeFeatures = SerializerFeature.WriteEnumUsingToString)
     private CheckResultStatus status;
 
     private List<String> messageList;

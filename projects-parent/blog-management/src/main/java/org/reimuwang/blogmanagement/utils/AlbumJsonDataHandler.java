@@ -3,7 +3,7 @@ package org.reimuwang.blogmanagement.utils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.reimuwang.commonability.file.FileWriteUtils;
+import org.reimuwang.commonability.file.FileIOUtils;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -75,7 +75,7 @@ public class AlbumJsonDataHandler {
         for (Map.Entry<String, JSONObject> entry : this.map.entrySet()) {
             rootArr.add(entry.getValue());
         }
-        FileWriteUtils.writeByChar(path, result.toJSONString());
+        FileIOUtils.writeByChar(path, result.toJSONString());
         return result;
     }
 }
