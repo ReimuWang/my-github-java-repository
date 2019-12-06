@@ -3,7 +3,7 @@ package org.reimuwang.blogmanagement.service.album.impl;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
-import org.reimuwang.blogmanagement.service.album.AlbumManageService;
+import org.reimuwang.blogmanagement.service.album.AlbumService;
 import org.reimuwang.blogmanagement.utils.AlbumJsonDataHandler;
 import org.reimuwang.commonability.alibaba.oss.AlibabaOssHandler;
 import org.reimuwang.commonability.image.ImageUtils;
@@ -19,7 +19,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class AlbumManageServiceImpl implements AlbumManageService {
+public class AlbumServiceImpl implements AlbumService {
 
     @Autowired
     private AlibabaOssHandler alibabaOssHandler;

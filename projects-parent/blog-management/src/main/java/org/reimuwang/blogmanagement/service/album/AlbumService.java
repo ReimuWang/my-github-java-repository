@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import java.io.IOException;
 
-public interface AlbumManageService {
+public interface AlbumService {
 
     JSONObject jsonGenerate(String logMark) throws IOException;
 

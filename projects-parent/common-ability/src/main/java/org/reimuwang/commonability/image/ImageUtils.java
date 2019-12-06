@@ -1,5 +1,7 @@
 package org.reimuwang.commonability.image;
 
+import org.apache.commons.io.FilenameUtils;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.HashSet;
@@ -46,8 +48,9 @@ public class ImageUtils {
         if (null == file || !file.exists() || !file.isFile() || file.isHidden()) {
             return false;
         }
-        String[] nameArray = file.getName().split("\\.");
-        if (nameArray.length != 2 || !IMAGE_TYPE_SET.contains(nameArray[1].toLowerCase())) {
+        // FilenameUtils.getBaseName(fileName)
+        String extension = FilenameUtils.getExtension(file.getName());
+        if (!IMAGE_TYPE_SET.contains(extension.toLowerCase())) {
             return false;
         }
         return true;
