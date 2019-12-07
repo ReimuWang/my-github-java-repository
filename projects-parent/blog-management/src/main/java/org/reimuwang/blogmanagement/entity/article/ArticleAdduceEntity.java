@@ -4,6 +4,9 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceSource;
+import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceStatus;
+import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceType;
 
 /**
  * 文章引用

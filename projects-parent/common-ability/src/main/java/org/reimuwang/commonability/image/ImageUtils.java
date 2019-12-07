@@ -48,7 +48,6 @@ public class ImageUtils {
         if (null == file || !file.exists() || !file.isFile() || file.isHidden()) {
             return false;
         }
-        // FilenameUtils.getBaseName(fileName)
         String extension = FilenameUtils.getExtension(file.getName());
         if (!IMAGE_TYPE_SET.contains(extension.toLowerCase())) {
             return false;

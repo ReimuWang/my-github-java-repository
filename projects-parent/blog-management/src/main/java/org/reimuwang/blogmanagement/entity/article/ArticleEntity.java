@@ -4,6 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceType;
 import org.reimuwang.blogmanagement.utils.ArticleParseHandler;
 import org.reimuwang.commonability.file.FileIOUtils;
 
@@ -67,8 +68,6 @@ public class ArticleEntity {
      * 文章引用列表，默认排序为文章中的出现顺序
      */
     private List<ArticleAdduceEntity> articleAdduceEntityList = new ArrayList<>();
-
-    private CheckResult checkResult = CheckResult.success();
 
     /**
      * 构建失败则返回null

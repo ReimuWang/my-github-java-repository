@@ -2,7 +2,7 @@ package org.reimuwang.blogmanagement.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.reimuwang.blogmanagement.entity.article.ArticleAdduceType;
+import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceType;
 import org.reimuwang.blogmanagement.entity.article.ArticleEntity;
 import org.reimuwang.commonability.file.FileIOUtils;
 

@@ -1,4 +1,4 @@
-package org.reimuwang.blogmanagement.entity.article;
+package org.reimuwang.blogmanagement.entity.article.articleenum;
 
 /**
  * 文章引用类型

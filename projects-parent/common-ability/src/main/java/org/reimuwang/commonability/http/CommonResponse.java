@@ -14,7 +14,7 @@ public class CommonResponse {
 
     private Integer totalCount;
 
-    public CommonResponse(Object data, Object msg) {
+    private CommonResponse(Object data, Object msg) {
         this.data = null == data ? new JSONObject() : data;
         this.msg = null == msg ? "" : msg;
     }
@@ -33,8 +33,8 @@ public class CommonResponse {
         return response;
     }
 
-    public static CommonResponse success(Object data, Integer totalCount) {
-        CommonResponse response = new CommonResponse(data, "");
+    public static CommonResponse success(Object data, Object msg, Integer totalCount) {
+        CommonResponse response = new CommonResponse(data, msg);
         response.setStatus(ResponseStatus.SUCCESS.getDesc());
         response.setTotalCount(null == totalCount ? 0 : totalCount);
         return response;
