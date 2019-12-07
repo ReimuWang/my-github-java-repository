@@ -11,7 +11,7 @@ public enum ArticleAdduceType {
 
     private String desc;
 
-    private ArticleAdduceType(String desc) {
+    ArticleAdduceType(String desc) {
         this.desc = desc;
     }
 

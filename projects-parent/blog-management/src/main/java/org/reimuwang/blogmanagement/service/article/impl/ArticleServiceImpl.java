@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.reimuwang.blogmanagement.entity.article.ArticleEntity;
+import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceSource;
+import org.reimuwang.blogmanagement.entity.article.request.ArticleQueryRequest;
 import org.reimuwang.blogmanagement.service.article.ArticleService;
 import org.reimuwang.commonability.server.CommonListResponse;
 import org.reimuwang.commonability.string.StringHandler;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -26,22 +29,23 @@ public class ArticleServiceImpl implements ArticleService {
     private String imageDirPath;
 
     @Override
-    public CommonListResponse<ArticleEntity> getArticleList(String logMark) throws Exception {
+    public CommonListResponse<ArticleEntity> getArticleList(ArticleQueryRequest articleQueryRequest, String logMark) throws Exception {
+        articleQueryRequest.check(logMark);
         CommonListResponse<ArticleEntity> result = new CommonListResponse<>();
-        File articleDir = new File(this.articleDirPath);
-        if (!articleDir.exists() || !articleDir.isDirectory()) {
-            log.warn(logMark + "配置文件中设定的文章目录不存在，articleDirPath=" + this.articleDirPath);
-            return result;
-        }
-        List<ArticleEntity> dataList = new ArrayList<>();
-        for(File article : articleDir.listFiles()) {
-            ArticleEntity articleEntity = ArticleEntity.build(article);
-            if (null == articleEntity) {
-                continue;
-            }
-            dataList.add(articleEntity);
-        }
+        List<ArticleEntity> dataList = this.getAllArticle(logMark).stream()
+                                       // 过滤：是否存在引用
+                                       .filter(articleEntity -> null == articleQueryRequest.getExistAdduce() ? true : articleQueryRequest.getExistAdduce() ^ articleEntity.getArticleAdduceEntityList().isEmpty())
+                                       // 过滤：引用来源
+                                       .filter(articleEntity -> {
+                                           if (null == articleQueryRequest.getAdduceSource()) {
+                                               return true;
+                                           }
+                                           ArticleAdduceSource articleAdduceSource = ArticleAdduceSource.getEnumByIndex(articleQueryRequest.getAdduceSource());
+                                           return articleEntity.containsAdduceSource(articleAdduceSource);
+                                       })
+                                       .collect(Collectors.toList());
         result.setTotalCount(dataList.size());
+        dataList = this.paging(dataList, articleQueryRequest.getPage(), articleQueryRequest.getPageSize(), logMark);
         result.setDataList(dataList);
         return result;
     }
@@ -58,10 +62,55 @@ public class ArticleServiceImpl implements ArticleService {
         return result;
     }
 
+    private List<ArticleEntity> getAllArticle(String logMark) throws Exception {
+        List<ArticleEntity> result = new ArrayList<>();
+        File articleDir = new File(this.articleDirPath);
+        if (!articleDir.exists() || !articleDir.isDirectory()) {
+            log.warn(logMark + "配置文件中设定的文章目录不存在，articleDirPath=" + this.articleDirPath);
+            return result;
+        }
+        for(File article : articleDir.listFiles()) {
+            ArticleEntity articleEntity = ArticleEntity.build(article);
+            if (null == articleEntity) {
+                continue;
+            }
+            result.add(articleEntity);
+        }
+        return result;
+    }
+
+    /**
+     * 分页
+     * @param dataList
+     * @param page 自1起
+     * @param pageSize
+     * @param logMark
+     * @return
+     */
+    private List<ArticleEntity> paging(List<ArticleEntity> dataList, Integer page, Integer pageSize, String logMark) {
+        logMark = "[分页]" + logMark;
+        if (dataList.isEmpty()) {
+            log.info(logMark + "传入数据为空，无需分页");
+            return dataList;
+        }
+        int totalSize = dataList.size();
+        int startIndex = (page - 1) * pageSize;
+        if (startIndex >= totalSize) {
+            log.info(logMark + "totalSize={},startIndex={},startIndex>=totalSize,无需分页", totalSize, startIndex);
+            return new ArrayList<>();
+        }
+        int endIndex = startIndex + pageSize - 1;
+        if (endIndex >= totalSize) {
+            endIndex = totalSize - 1;
+        }
+        log.info(logMark + "totalSize={},[{},{}] -> [{},{}]", totalSize, page, pageSize, startIndex, endIndex);
+        return dataList.subList(startIndex, endIndex + 1);
+    }
+
     private void recoverFileNameForArticle(JSONObject result, Boolean preview, String charSequence, String logMark) throws Exception {
         JSONArray articleList = new JSONArray();
         result.put("articleList", articleList);
-        List<ArticleEntity> dataList = this.getArticleList(logMark).getDataList();
+        List<ArticleEntity> dataList = this.getAllArticle(logMark);
         for (ArticleEntity articleEntity : dataList) {
             this.recoverIllegalName(articleEntity.getArticle(), articleList, charSequence, preview, null, false, logMark);
         }
@@ -132,10 +181,5 @@ public class ArticleServiceImpl implements ArticleService {
         file.renameTo(new File(newFilePath));
         log.info(logMark + "[更名成功]" + msgForLog);
         return false;
-    }
-    
-    public static void main(String[] args) {
-        File file = new File("/Users/reimuwang/hexo/themes/next/source/images/blog_pic/Python");
-        System.out.println(file.getName());
     }
 }

@@ -26,7 +26,7 @@ public class ArticleController {
         String logMark = "[" + System.currentTimeMillis() + "][获取文章列表]";
         log.info(logMark + "接到http请求,articleQueryRequest=" + articleQueryRequest);
         try {
-            CommonListResponse<ArticleEntity> result = this.articleService.getArticleList(logMark);
+            CommonListResponse<ArticleEntity> result = this.articleService.getArticleList(articleQueryRequest, logMark);
             return CommonResponse.success(result.getDataList(), null, result.getTotalCount());
         } catch (Exception e) {
             log.error(logMark + "执行出错", e);

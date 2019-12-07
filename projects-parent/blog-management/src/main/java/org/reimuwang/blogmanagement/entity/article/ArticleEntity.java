@@ -4,6 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceSource;
 import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceType;
 import org.reimuwang.blogmanagement.utils.ArticleParseHandler;
 import org.reimuwang.commonability.file.FileIOUtils;
@@ -102,5 +103,12 @@ public class ArticleEntity {
 
     public void addArticleAdduceEntity(String showName, String path, ArticleAdduceType type) {
         this.articleAdduceEntityList.add(new ArticleAdduceEntity(showName, path, type));
+    }
+
+    public boolean containsAdduceSource(ArticleAdduceSource articleAdduceSource) {
+        if (null == articleAdduceSource) {
+            throw new NullPointerException("articleAdduceSource为空");
+        }
+        return articleAdduceEntityList.stream().filter(a -> a.getSource().equals(articleAdduceSource)).count() > 0;
     }
 }
