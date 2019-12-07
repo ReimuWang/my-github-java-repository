@@ -8,7 +8,6 @@ import org.reimuwang.commonability.http.CommonResponse;
 import org.reimuwang.commonability.server.CommonListResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -23,7 +22,7 @@ public class ArticleController {
 
     @RequestMapping("/list")
     @ResponseBody
-    public CommonResponse getArticleList(@RequestBody(required = false) ArticleQueryRequest articleQueryRequest) {
+    public CommonResponse getArticleList(ArticleQueryRequest articleQueryRequest) {
         String logMark = "[" + System.currentTimeMillis() + "][获取文章列表]";
         log.info(logMark + "接到http请求,articleQueryRequest=" + articleQueryRequest);
         try {
