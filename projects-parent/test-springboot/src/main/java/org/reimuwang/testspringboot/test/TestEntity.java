@@ -2,12 +2,15 @@ package org.reimuwang.testspringboot.test;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class TestEntity {
 
     private String id;
 
-    private List<Integer> types;
+    private Integer value;
+
+    public TestEntity(String id, Integer value) {
+        this.id = id;
+        this.value = value;
+    }
 }

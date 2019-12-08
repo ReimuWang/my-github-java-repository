@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 按照hexo文章生成规范，文章头部区域例子为：
@@ -105,10 +106,13 @@ public class ArticleEntity {
         this.articleAdduceEntityList.add(new ArticleAdduceEntity(showName, path, type));
     }
 
-    public boolean containsAdduceSource(ArticleAdduceSource articleAdduceSource) {
+    public void filterAdduceSource(ArticleAdduceSource articleAdduceSource) {
         if (null == articleAdduceSource) {
             throw new NullPointerException("articleAdduceSource为空");
         }
-        return articleAdduceEntityList.stream().filter(a -> a.getSource().equals(articleAdduceSource)).count() > 0;
+        this.articleAdduceEntityList = articleAdduceEntityList
+                                       .stream()
+                                       .filter(a -> a.getSource().equals(articleAdduceSource))
+                                       .collect(Collectors.toList());
     }
 }

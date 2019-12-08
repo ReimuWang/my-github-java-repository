@@ -4,9 +4,12 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.reimuwang.blogmanagement.constant.ArticleConstant;
 import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceSource;
 import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceStatus;
 import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceType;
+
+import java.io.File;
 
 /**
  * 文章引用
@@ -52,6 +55,7 @@ public class ArticleAdduceEntity {
         this.path = path;
         this.type = type;
         this.judgeAndSetSource();
+        this.judgeAndSetStatus();
     }
 
     private void judgeAndSetSource() {
@@ -59,5 +63,28 @@ public class ArticleAdduceEntity {
             return;
         }
         this.source = path.startsWith("http") ? ArticleAdduceSource.WEB : ArticleAdduceSource.INTERIOR;
+    }
+
+    private void judgeAndSetStatus() {
+        if (!ArticleAdduceSource.INTERIOR.equals(this.source)) {
+            return;
+        }
+        switch (this.type) {
+            case ARTICLE:
+                break;
+            case IMAGE:
+                if (!this.path.startsWith(ArticleConstant.IMAGE_PREFIX)) {
+                    this.status = ArticleAdduceStatus.INACCESSIBLE;
+                    break;
+                }
+                String realPath = ArticleConstant.IMAGE_DIR_PATH + path.replaceFirst(ArticleConstant.IMAGE_PREFIX, "");
+                File image = new File(realPath);
+                if (!image.exists() || !image.isFile()) {
+                    this.status = ArticleAdduceStatus.INACCESSIBLE;
+                    break;
+                }
+                this.status = ArticleAdduceStatus.ACCESSIBLE;
+                break;
+        }
     }
 }

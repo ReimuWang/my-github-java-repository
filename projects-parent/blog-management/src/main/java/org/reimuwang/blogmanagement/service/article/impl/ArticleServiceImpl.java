@@ -4,13 +4,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.reimuwang.blogmanagement.constant.ArticleConstant;
 import org.reimuwang.blogmanagement.entity.article.ArticleEntity;
 import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceSource;
 import org.reimuwang.blogmanagement.entity.article.request.ArticleQueryRequest;
 import org.reimuwang.blogmanagement.service.article.ArticleService;
 import org.reimuwang.commonability.server.CommonListResponse;
 import org.reimuwang.commonability.string.StringHandler;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -21,12 +21,6 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class ArticleServiceImpl implements ArticleService {
-
-    @Value("${reimuwang.article.articleDir}")
-    private String articleDirPath;
-
-    @Value("${reimuwang.article.imageDir}")
-    private String imageDirPath;
 
     @Override
     public CommonListResponse<ArticleEntity> getArticleList(ArticleQueryRequest articleQueryRequest, String logMark) throws Exception {
@@ -41,7 +35,8 @@ public class ArticleServiceImpl implements ArticleService {
                                                return true;
                                            }
                                            ArticleAdduceSource articleAdduceSource = ArticleAdduceSource.getEnumByIndex(articleQueryRequest.getAdduceSource());
-                                           return articleEntity.containsAdduceSource(articleAdduceSource);
+                                           articleEntity.filterAdduceSource(articleAdduceSource);
+                                           return !articleEntity.getArticleAdduceEntityList().isEmpty();
                                        })
                                        .collect(Collectors.toList());
         result.setTotalCount(dataList.size());
@@ -64,9 +59,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     private List<ArticleEntity> getAllArticle(String logMark) throws Exception {
         List<ArticleEntity> result = new ArrayList<>();
-        File articleDir = new File(this.articleDirPath);
+        File articleDir = new File(ArticleConstant.ARTICLE_DIR_PATH);
         if (!articleDir.exists() || !articleDir.isDirectory()) {
-            log.warn(logMark + "配置文件中设定的文章目录不存在，articleDirPath=" + this.articleDirPath);
+            log.warn(logMark + "配置文件中设定的文章目录不存在，articleDirPath=" + ArticleConstant.ARTICLE_DIR_PATH);
             return result;
         }
         for(File article : articleDir.listFiles()) {
@@ -119,14 +114,14 @@ public class ArticleServiceImpl implements ArticleService {
     private void recoverFileNameForImage(JSONObject result, Boolean preview, String charSequence, String logMark) throws Exception {
         JSONArray imageDirList = new JSONArray();
         result.put("imageDirList", imageDirList);
-        File imageDir = new File(this.imageDirPath);
+        File imageDir = new File(ArticleConstant.IMAGE_DIR_PATH);
         if (!imageDir.exists() || !imageDir.isDirectory()) {
-            log.warn(logMark + "配置文件中设定的图片目录不存在，articleDirPath=" + this.articleDirPath);
+            log.warn(logMark + "配置文件中设定的图片目录不存在，图片目录=" + ArticleConstant.IMAGE_DIR_PATH);
             return;
         }
         for(File imageDirCategory : imageDir.listFiles()) {
             if (!imageDirCategory.isDirectory()) {
-                log.warn(logMark + "配置文件中设定的图片目录下存在非文件夹的文件。图片目录=" + this.articleDirPath + "，非法文件=" + imageDirCategory.getName());
+                log.warn(logMark + "配置文件中设定的图片目录下存在非文件夹的文件。图片目录=" + ArticleConstant.IMAGE_DIR_PATH + "，非法文件=" + imageDirCategory.getName());
                 continue;
             }
             this.recoverIllegalName(imageDirCategory, imageDirList, charSequence, preview, null, true, logMark);
