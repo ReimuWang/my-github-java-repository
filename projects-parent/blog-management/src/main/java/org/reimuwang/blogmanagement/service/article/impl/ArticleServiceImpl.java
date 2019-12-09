@@ -7,6 +7,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.reimuwang.blogmanagement.constant.ArticleConstant;
 import org.reimuwang.blogmanagement.entity.article.ArticleEntity;
 import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceSource;
+import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceStatus;
 import org.reimuwang.blogmanagement.entity.article.request.ArticleQueryRequest;
 import org.reimuwang.blogmanagement.service.article.ArticleService;
 import org.reimuwang.commonability.server.CommonListResponse;
@@ -14,8 +15,7 @@ import org.reimuwang.commonability.string.StringHandler;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,8 +34,15 @@ public class ArticleServiceImpl implements ArticleService {
                                            if (null == articleQueryRequest.getAdduceSource()) {
                                                return true;
                                            }
-                                           ArticleAdduceSource articleAdduceSource = ArticleAdduceSource.getEnumByIndex(articleQueryRequest.getAdduceSource());
-                                           articleEntity.filterAdduceSource(articleAdduceSource);
+                                           articleEntity.filterAdduceSource(ArticleAdduceSource.getEnumByIndex(articleQueryRequest.getAdduceSource()));
+                                           return !articleEntity.getArticleAdduceEntityList().isEmpty();
+                                       })
+                                       // 过滤：引用是否有效
+                                       .filter(articleEntity -> {
+                                           if (null == articleQueryRequest.getAdduceStatus()) {
+                                               return true;
+                                           }
+                                           articleEntity.filterAdduceStatus(ArticleAdduceStatus.getEnumByIndex(articleQueryRequest.getAdduceStatus()));
                                            return !articleEntity.getArticleAdduceEntityList().isEmpty();
                                        })
                                        .collect(Collectors.toList());
@@ -64,13 +71,16 @@ public class ArticleServiceImpl implements ArticleService {
             log.warn(logMark + "配置文件中设定的文章目录不存在，articleDirPath=" + ArticleConstant.ARTICLE_DIR_PATH);
             return result;
         }
+        Set<String> canAdduceSet = new HashSet<>();
         for(File article : articleDir.listFiles()) {
             ArticleEntity articleEntity = ArticleEntity.build(article);
             if (null == articleEntity) {
                 continue;
             }
             result.add(articleEntity);
+            canAdduceSet.add(articleEntity.getForAdducePath());
         }
+        result.forEach(articleEntity -> articleEntity.judgeAndSetAdduceStatus(canAdduceSet));
         return result;
     }
 

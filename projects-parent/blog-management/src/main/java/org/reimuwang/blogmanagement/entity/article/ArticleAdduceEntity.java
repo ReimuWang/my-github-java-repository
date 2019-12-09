@@ -10,6 +10,7 @@ import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceStat
 import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceType;
 
 import java.io.File;
+import java.util.Set;
 
 /**
  * 文章引用
@@ -55,7 +56,6 @@ public class ArticleAdduceEntity {
         this.path = path;
         this.type = type;
         this.judgeAndSetSource();
-        this.judgeAndSetStatus();
     }
 
     private void judgeAndSetSource() {
@@ -65,12 +65,13 @@ public class ArticleAdduceEntity {
         this.source = path.startsWith("http") ? ArticleAdduceSource.WEB : ArticleAdduceSource.INTERIOR;
     }
 
-    private void judgeAndSetStatus() {
+    public void judgeAndSetStatus(Set<String> canAdduceSet) {
         if (!ArticleAdduceSource.INTERIOR.equals(this.source)) {
             return;
         }
         switch (this.type) {
             case ARTICLE:
+                this.status = canAdduceSet.contains(this.path) ? ArticleAdduceStatus.ACCESSIBLE : ArticleAdduceStatus.INACCESSIBLE;
                 break;
             case IMAGE:
                 if (!this.path.startsWith(ArticleConstant.IMAGE_PREFIX)) {

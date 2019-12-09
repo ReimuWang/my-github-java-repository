@@ -5,15 +5,14 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceSource;
+import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceStatus;
 import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceType;
 import org.reimuwang.blogmanagement.utils.ArticleParseHandler;
 import org.reimuwang.commonability.file.FileIOUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -72,6 +71,15 @@ public class ArticleEntity {
     private List<ArticleAdduceEntity> articleAdduceEntityList = new ArrayList<>();
 
     /**
+     * 若想在博客内部的另一篇文章中引用本文，需填写的引用路径
+     * 格式：
+     * createTime的日期部分/fileName去后缀md
+     * 形如：
+     * /2017/10/16/Java基础-技术体系/
+     */
+    private String forAdducePath = "";
+
+    /**
      * 构建失败则返回null
      * @return
      */
@@ -84,6 +92,7 @@ public class ArticleEntity {
         result.article = article;
         result.fileName = result.article.getName();
         ArticleParseHandler.init(FileIOUtils.readByLine(result.article.getPath()), result).parse();
+        result.forAdducePath = new SimpleDateFormat("/yyyy/MM/dd/").format(result.createTime) + FilenameUtils.getBaseName(result.fileName) + "/";
         return result;
     }
 
@@ -108,11 +117,25 @@ public class ArticleEntity {
 
     public void filterAdduceSource(ArticleAdduceSource articleAdduceSource) {
         if (null == articleAdduceSource) {
-            throw new NullPointerException("articleAdduceSource为空");
+            throw new NullPointerException("传入的articleAdduceSource为空");
         }
         this.articleAdduceEntityList = articleAdduceEntityList
                                        .stream()
-                                       .filter(a -> a.getSource().equals(articleAdduceSource))
+                                       .filter(aa -> aa.getSource().equals(articleAdduceSource))
                                        .collect(Collectors.toList());
+    }
+
+    public void filterAdduceStatus(ArticleAdduceStatus articleAdduceStatus) {
+        if (null == articleAdduceStatus) {
+            throw new NullPointerException("传入的articleAdduceStatus为空");
+        }
+        this.articleAdduceEntityList = articleAdduceEntityList
+                                       .stream()
+                                       .filter(aa -> aa.getStatus().equals(articleAdduceStatus))
+                                       .collect(Collectors.toList());
+    }
+
+    public void judgeAndSetAdduceStatus(Set<String> canAdduceSet) {
+        this.articleAdduceEntityList.forEach(articleAdduceEntity -> articleAdduceEntity.judgeAndSetStatus(canAdduceSet));
     }
 }

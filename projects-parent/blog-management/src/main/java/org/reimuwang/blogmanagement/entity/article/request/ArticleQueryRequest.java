@@ -3,6 +3,7 @@ package org.reimuwang.blogmanagement.entity.article.request;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceSource;
+import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceStatus;
 
 @Data
 @Slf4j
@@ -30,6 +31,11 @@ public class ArticleQueryRequest {
      */
     private Integer adduceSource;
 
+    /**
+     * ArticleAdduceStatus.index
+     */
+    private Integer adduceStatus;
+
     public void check(String logMark) {
         if (null == page || page <= 0) {
             this.throwCheckException(logMark + "page必须为大于等于1的整数,page=" + this.page);
@@ -39,6 +45,9 @@ public class ArticleQueryRequest {
         }
         if (null != adduceSource && !ArticleAdduceSource.effective(adduceSource)) {
             this.throwCheckException("adduceSource=" + adduceSource + "，非法，合法值=" + ArticleAdduceSource.SHOW);
+        }
+        if (null != adduceStatus && !ArticleAdduceStatus.effective(adduceStatus)) {
+            this.throwCheckException("adduceStatus=" + adduceStatus + "，非法，合法值=" + ArticleAdduceStatus.SHOW);
         }
     }
 
