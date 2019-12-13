@@ -5,6 +5,7 @@ import org.reimuwang.blogmanagement.service.album.AlbumService;
 import org.reimuwang.commonability.http.CommonResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -17,7 +18,7 @@ public class AlbumController {
     @Autowired
     private AlbumService albumService;
 
-    @RequestMapping("/json/generate")
+    @GetMapping("/json/generate")
     @ResponseBody
     public CommonResponse jsonGenerate() {
         String logMark = "[" + System.currentTimeMillis() + "][生成相册json文件]";
@@ -30,7 +31,7 @@ public class AlbumController {
         }
     }
 
-    @RequestMapping("/image/compressAndCopy")
+    @GetMapping("/image/compressAndCopy")
     @ResponseBody
     public CommonResponse imageCompressAndCopy(@RequestParam(value = "photoQuality", required = false) Float photoQuality) {
         String logMark = "[" + System.currentTimeMillis() + "][图片压缩复制]";

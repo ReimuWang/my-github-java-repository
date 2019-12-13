@@ -8,6 +8,7 @@ import org.reimuwang.commonability.http.CommonResponse;
 import org.reimuwang.commonability.server.CommonListResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,7 +21,7 @@ public class ArticleController {
     @Autowired
     private ArticleService articleService;
 
-    @RequestMapping("/list")
+    @GetMapping("/list")
     @ResponseBody
     public CommonResponse getArticleList(ArticleQueryRequest articleQueryRequest) {
         String logMark = "[" + System.currentTimeMillis() + "][获取文章列表]";
@@ -34,7 +35,7 @@ public class ArticleController {
         }
     }
 
-    @RequestMapping("/recover/fileName")
+    @GetMapping("/recover/fileName")
     @ResponseBody
     public CommonResponse recoverFileName(@RequestParam(value = "preview", defaultValue = "true") Boolean preview) {
         String logMark = "[" + System.currentTimeMillis() + "][修复文件名称]";
