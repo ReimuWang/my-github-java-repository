@@ -64,5 +64,4 @@ public class AlbumController {
             return CommonResponse.error("执行出错，" + e.getMessage());
         }
     }
-
 }
