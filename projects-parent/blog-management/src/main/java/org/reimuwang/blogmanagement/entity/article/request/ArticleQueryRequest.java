@@ -4,20 +4,11 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceSource;
 import org.reimuwang.blogmanagement.entity.article.articleenum.ArticleAdduceStatus;
+import org.reimuwang.commonability.http.CommonRequest;
 
 @Data
 @Slf4j
-public class ArticleQueryRequest {
-
-    /**
-     * 分页页码，自1开始
-     */
-    private Integer page = 1;
-
-    /**
-     * 每页个数
-     */
-    private Integer pageSize = 10;
+public class ArticleQueryRequest extends CommonRequest {
 
     /**
      * true-文章中存在引用
