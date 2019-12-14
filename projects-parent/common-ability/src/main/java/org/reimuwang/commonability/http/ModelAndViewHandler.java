@@ -50,19 +50,17 @@ public class ModelAndViewHandler {
         Integer totalCount = result.getTotalCount();
         Integer page = request.getPage();
         Integer pageSize = request.getPageSize();
-        int lastPage = totalCount % pageSize == 0 ? totalCount / pageSize : totalCount / pageSize + 1;
+        int maxPage = totalCount % pageSize == 0 ? totalCount / pageSize : totalCount / pageSize + 1;
 
         this.add("currentPage", page);
+        this.add("maxPage", maxPage);
         List<Integer> pageList = new ArrayList<>();
         this.add("pageList", pageList);
 
         int pageWishShowStart = page - (this.pageCountForShow - 1) / 2;
         pageWishShowStart = pageWishShowStart <= 0 ? 1 : pageWishShowStart;
         int pageWishShowEnd = page + (this.pageCountForShow - 1) / 2;
-        pageWishShowEnd = pageWishShowEnd > lastPage ? lastPage : pageWishShowEnd;
-
-        this.add("previousPage", pageWishShowStart - 1);
-        this.add("nextPage", pageWishShowEnd >= lastPage ? 0 : pageWishShowEnd + 1);
+        pageWishShowEnd = pageWishShowEnd > maxPage ? maxPage : pageWishShowEnd;
 
         for (int i = pageWishShowStart; i <= pageWishShowEnd; i++) {
             pageList.add(i);
