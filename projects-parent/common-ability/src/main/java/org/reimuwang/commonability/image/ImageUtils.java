@@ -1,9 +1,16 @@
 package org.reimuwang.commonability.image;
 
 import org.apache.commons.io.FilenameUtils;
+import org.reimuwang.commonability.file.FileIOUtils;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -53,5 +60,15 @@ public class ImageUtils {
             return false;
         }
         return true;
+    }
+
+    public static void downloadImage(String urlPath, String downloadPath) throws IOException {
+        HttpURLConnection conn = (HttpURLConnection)new URL(urlPath).openConnection();
+        conn.setRequestMethod("GET");
+        conn.setConnectTimeout(5 * 1000);
+        byte[] data = FileIOUtils.readInputStream(conn.getInputStream());
+        try (FileOutputStream outStream = new FileOutputStream(new File(downloadPath))) {
+            outStream.write(data);
+        }
     }
 }

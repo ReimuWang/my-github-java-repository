@@ -54,4 +54,20 @@ public class FileIOUtils {
             writer.flush();
         }
     }
+
+    public static byte[] readInputStream(InputStream inStream) throws IOException {
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        byte[] result;
+        try {
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len=inStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, len);
+            }
+            result = outStream.toByteArray();
+        } finally {
+            outStream.close();
+        }
+        return result;
+    }
 }
