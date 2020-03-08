@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.reimuwang</groupId>
-    <artifactId>projects-parent</artifactId>
+    <artifactId>my-github-java-repository</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
