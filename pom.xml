@@ -12,8 +12,6 @@
         <module>common-ability</module>
         <module>file-management</module>
         <module>blog-management</module>
-        <module>test-springboot</module>
-        <module>test-spring</module>
     </modules>
 
     <dependencyManagement>
